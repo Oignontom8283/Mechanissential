@@ -76,4 +76,95 @@ public class Utils {
     #endregion
 
 
+    #region Json Utilities
+
+    /// <summary>
+    /// Tries to deserialize a JSON string into an object of the specified type.
+    /// </summary>
+    /// <typeparam name="T">The type of object to deserialize.</typeparam>
+    /// <param name="json">The JSON string to deserialize.</param>
+    /// <exception cref="InvalidOperationException">Thrown when deserialization fails.</exception>
+    /// <returns>The deserialized object, or the default value if deserialization fails.</returns>
+    public static T FromJsonOrThrow<T>(string json)
+    {
+        try
+        {
+            return JsonUtility.FromJson<T>(json);
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException($"Failed to deserialize JSON to type {typeof(T).FullName}.", ex);
+        }
+    }
+
+    /// <summary>
+    /// Tries to deserialize a JSON string into an object of the specified type.
+    /// </summary>
+    /// <typeparam name="T">The type of object to deserialize (must be a class).</typeparam>
+    /// <param name="json">The JSON string to deserialize.</param>
+    /// <returns>The deserialized object, or null</returns>
+    public static T FromJsonOrNull<T>(string json) where T : class
+    {
+        if (string.IsNullOrWhiteSpace(json))
+        {
+            MechanicaSaveFix.Log.LogWarning($"Failed to deserialize JSON to type {typeof(T).FullName}: input string is null or empty.");
+            return null;
+        }
+
+        try
+        {
+            return JsonUtility.FromJson<T>(json);
+        }
+        catch (Exception ex)
+        {
+            MechanicaSaveFix.Log.LogWarning($"Failed to deserialize JSON to type {typeof(T).FullName}: {ex.Message}");
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// Serializes an object to a JSON string. Throws an exception if serialization fails.
+    /// </summary>
+    /// <typeparam name="T">The type of the object to serialize.</typeparam>
+    /// <param name="obj">The object to serialize.</param>
+    /// <returns>The JSON string representing the object.</returns>
+    /// <exception cref="InvalidOperationException">Thrown when serialization fails.</exception>
+    public static string ToJsonOrThrow<T>(T obj)
+    {
+        try
+        {
+            return JsonUtility.ToJson(obj);
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException($"Failed to serialize object of type {typeof(T).FullName} to JSON.", ex);
+        }
+    }
+
+    /// <summary>
+    /// Serializes an object to a JSON string. Returns null if serialization fails.
+    /// </summary>
+    /// <typeparam name="T">The type of the object to serialize.</typeparam>
+    /// <param name="obj">The object to serialize.</param>
+    /// <returns>The JSON string representing the object, or null if serialization fails.</returns>
+    public static string ToJsonOrNull<T>(T obj)
+    {
+        if (obj == null)
+        {
+            MechanicaSaveFix.Log.LogWarning($"Failed to serialize object of type {typeof(T).FullName} to JSON: object is null.");
+            return null;
+        }
+
+        try
+        {
+            return JsonUtility.ToJson(obj);
+        }
+        catch (Exception ex)
+        {
+            MechanicaSaveFix.Log.LogWarning($"Failed to serialize object of type {typeof(T).FullName} to JSON: {ex.Message}");
+            return null;
+        }
+    }
+
+    #endregion
 }
