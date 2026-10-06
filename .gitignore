@@ -1,0 +1,8 @@
+*.sln
+obj/
+bin/
+Assembly-CSharp/
+log/
+*user.json
+*.lnk
+output/
