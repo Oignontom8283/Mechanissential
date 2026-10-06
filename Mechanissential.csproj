@@ -1,0 +1,90 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
+  <!-- Exclude the Assembly-CSharp folder from compilation -->
+  <ItemGroup>
+    <Compile Remove="Assembly-CSharp\**" />
+    <EmbeddedResource Remove="Assembly-CSharp\**" />
+    <None Remove="Assembly-CSharp\**" />
+  </ItemGroup>
+
+  <!-- Generate build information -->
+  <PropertyGroup>
+    <GeneratedSourceFilePath>obj\BuildInfo.g.cs</GeneratedSourceFilePath>
+  </PropertyGroup>
+  <Target Name="GetGitVersion" BeforeTargets="CoreCompile">
+    <!-- Get the git tag version -->
+    <Exec Command="git describe --tags --match &quot;v*.*.*&quot; --always --abbrev=0" ConsoleToMSBuild="true" StandardOutputImportance="low">
+      <Output TaskParameter="ConsoleOutput" PropertyName="GitVersionTag" />
+    </Exec>
+
+    <!-- Get the git commit hash -->
+    <Exec Command="git rev-parse HEAD" ConsoleToMSBuild="true" StandardOutputImportance="low">
+      <Output TaskParameter="ConsoleOutput" PropertyName="GitCommitHash" />
+    </Exec>
+
+    <PropertyGroup>
+      <GitVersionTag>$(GitVersionTag.TrimStart('v'))</GitVersionTag> <!-- Remove the leading 'v' from the version tag -->
+      <BuildDateUtc>$([System.DateTime]::UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ"))</BuildDateUtc> <!-- Get the build date in UTC -->
+    </PropertyGroup>
+
+    <ItemGroup>
+      <Compile Include="$(GeneratedSourceFilePath)" />
+    </ItemGroup>
+
+    <!-- Generate the build information source file -->
+    <WriteLinesToFile File="$(GeneratedSourceFilePath)" Lines="internal static class BuildInfo { internal const string Version = &quot;$(GitVersionTag)&quot;%3B internal const string CommitHash = &quot;$(GitCommitHash)&quot;%3B internal const string BuildDateUtc = &quot;$(BuildDateUtc)&quot;%3B }" Overwrite="true" WriteOnlyWhenDifferent="true" />
+  </Target>
+
+  <ItemGroup>
+
+    <Reference Include="HarmonyLib">
+      <HintPath>Libraries/0Harmony.ref.dll</HintPath>
+    </Reference>
+
+    <Reference Include="BepInEx">
+      <HintPath>Libraries/BepInEx.ref.dll</HintPath>
+    </Reference>
+
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>Libraries/UnityEngine.CoreModule.ref.dll</HintPath>
+    </Reference>
+
+    <Reference Include="UnityEngine.JSONSerializeModule">
+      <HintPath>Libraries/UnityEngine.JSONSerializeModule.ref.dll</HintPath>
+    </Reference>
+
+    <Reference Include="UnityEngine">
+      <HintPath>Libraries/UnityEngine.ref.dll</HintPath>
+    </Reference>
+
+    <Reference Include="UnityEngine.UI">
+      <HintPath>Libraries/UnityEngine.UI.ref.dll</HintPath>
+    </Reference>
+
+    <Reference Include="UnityEngine.ImageConversionModule">
+      <HintPath>Libraries/UnityEngine.ImageConversionModule.ref.dll</HintPath>
+    </Reference>
+
+    <Reference Include="UnityEngine.InputLegacyModule">
+      <HintPath>Libraries/UnityEngine.InputLegacyModule.ref.dll</HintPath>
+    </Reference>
+
+    <Reference Include="UnityEngine.UnityWebRequestModule">
+      <HintPath>Libraries/UnityEngine.UnityWebRequestModule.ref.dll</HintPath>
+    </Reference>
+
+    <Reference Include="Assembly-CSharp">
+      <HintPath>Libraries/Assembly-CSharp.ref.dll</HintPath>
+    </Reference>
+
+    <Reference Include="PhotonUnityNetworking">
+      <HintPath>Libraries/PhotonUnityNetworking.ref.dll</HintPath>
+    </Reference>
+
+  </ItemGroup>
+</Project>
