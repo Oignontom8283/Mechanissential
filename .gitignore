@@ -6,3 +6,5 @@ log/
 *user.json
 *.lnk
 output/
+Libraries/*.dll
+!Libraries/*.ref.dll
